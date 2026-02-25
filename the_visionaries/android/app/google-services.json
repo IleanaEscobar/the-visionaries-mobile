@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "734456671677",
+    "project_id": "the-visionaries-mobile",
+    "storage_bucket": "the-visionaries-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:734456671677:android:992fc092296ece97ee36d4",
+        "android_client_info": {
+          "package_name": "com.example.the_visionaries"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiggezgXgmYVWF4qnWblRcL0cSPQW3IFs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
