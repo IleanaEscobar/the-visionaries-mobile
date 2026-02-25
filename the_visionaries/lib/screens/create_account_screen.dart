@@ -72,15 +72,40 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _createAccount,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text("Create Account"),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              height: 56,
+              child: OutlinedButton(
+                onPressed: _isLoading ? null : _createAccount,
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE6E6E6),
+                  side: const BorderSide(
+                    color: Color(0xFFB0B0B0),
+                    width: 1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFF1C1C1C)),
+                        ),
+                      )
+                    : const Text(
+                        "Create Account",
+                        style: TextStyle(
+                          color: Color(0xFF1C1C1C),
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+              ),
             ),
           ],
         ),

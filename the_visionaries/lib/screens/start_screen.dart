@@ -7,6 +7,8 @@ class StartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF7CC6FE), Color(0xFF3A8DFF)],
@@ -14,20 +16,91 @@ class StartScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Center(
+        child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.remove_red_eye, size: 100, color: Colors.white),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/login'),
-                child: const Text("Log in"),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  height: MediaQuery.of(context).size.width * 0.45,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F8FF),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        height: MediaQuery.of(context).size.width * 0.45,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: () => Navigator.pushNamed(context, '/create'),
-                child: const Text("Create Account"),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+              Center(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(context, '/login'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF174F7C),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 4,
+                        ),
+                        child: const Text(
+                          "Log in",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      height: 56,
+                      child: OutlinedButton(
+                        onPressed: () =>
+                            Navigator.pushNamed(context, '/create'),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFFFFF),
+                          side: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          "Create Account",
+                          style: TextStyle(
+                            color: Color(0xFF1C1C1C),
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

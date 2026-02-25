@@ -19,7 +19,18 @@ class _ControlPanelState extends State<ControlPanel> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.remove_red_eye, size: 40),
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE4F4FF),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child:
+                  Image.asset('assets/images/logo.png', width: 40, height: 40),
+            ),
+          ),
           const SizedBox(height: 20),
           LevelSelector(
             selected: selectedLevel,
