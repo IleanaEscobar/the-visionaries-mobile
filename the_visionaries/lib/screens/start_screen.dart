@@ -10,10 +10,11 @@ class StartScreen extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF7CC6FE), Color(0xFF3A8DFF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          image: DecorationImage(
+            image: AssetImage('assets/images/background_start.png'),
+            fit: BoxFit.fitHeight,
+            alignment: Alignment.center,
+            scale: 2.0,
           ),
         ),
         child: SingleChildScrollView(
@@ -30,7 +31,7 @@ class StartScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
