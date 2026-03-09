@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class ControlPanel extends StatefulWidget {
   const ControlPanel({super.key});
@@ -12,89 +13,161 @@ class ControlPanel extends StatefulWidget {
 class _ControlPanelState extends State<ControlPanel> {
   bool isOn = false;
   double fanSpeed = 0.0;
-  double lastSpeed = 50.0; // Store last non-zero speed
-  final DatabaseReference _dbRef = FirebaseDatabase.instanceFor(
-    app: Firebase.app(),
-    databaseURL:
-        'https://the-visionaries-mobile.firebaseio.com', // Replace with your Firebase database URL
-  ).ref();
+  double lastSpeed = 50.0;
 
-  Future<void> sendFanSpeed(double speed) async {
+  bool isConnecting = false;
+  bool isConnected = false;
+
+  BluetoothDevice? _device;
+  BluetoothCharacteristic? _speedChar;
+
+  static const String deviceName = 'NanoESP32Fan';
+  static final Guid serviceUuid = Guid('12345678-1234-1234-1234-1234567890ab');
+  static final Guid speedCharUuid = Guid(
+    'abcdefab-1234-1234-1234-abcdefabcdef',
+  );
+
+  @override
+  void dispose() {
+    _device?.disconnect();
+    super.dispose();
+  }
+
+  Future<void> connectBle() async {
+    setState(() => isConnecting = true);
+
+    ScanResult? found;
+    final sub = FlutterBluePlus.scanResults.listen((results) {
+      for (final r in results) {
+        if (r.device.platformName == deviceName) {
+          found = r;
+        }
+      }
+    });
+
     try {
-      await _dbRef.child('devices/fan/speed').set(speed.toStringAsFixed(0));
+      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 6));
+      await Future.delayed(const Duration(seconds: 6));
+      await FlutterBluePlus.stopScan();
+
+      if (found == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('BLE device not found')));
+        return;
+      }
+
+      _device = found!.device;
+      await _device!.connect(timeout: const Duration(seconds: 8));
+
+      final services = await _device!.discoverServices();
+      for (final s in services) {
+        if (s.uuid == serviceUuid) {
+          for (final c in s.characteristics) {
+            if (c.uuid == speedCharUuid) {
+              _speedChar = c;
+              break;
+            }
+          }
+        }
+      }
+
+      if (_speedChar == null) {
+        throw Exception('Speed characteristic not found');
+      }
+
+      setState(() => isConnected = true);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ).showSnackBar(SnackBar(content: Text('BLE error: $e')));
+    } finally {
+      await sub.cancel();
+      if (mounted) setState(() => isConnecting = false);
     }
+  }
+
+  Future<void> sendFanSpeedBle(double speed) async {
+    if (_speedChar == null) return;
+    final v = speed.clamp(0, 100).round();
+    await _speedChar!.write([v], withoutResponse: true);
+  }
+
+  Future<void> togglePower() async {
+    setState(() {
+      if (isOn) {
+        if (fanSpeed > 0) lastSpeed = fanSpeed;
+        fanSpeed = 0;
+        isOn = false;
+      } else {
+        fanSpeed = lastSpeed; // restore previous speed
+        isOn = fanSpeed > 0;
+      }
+    });
+    await sendFanSpeedBle(fanSpeed);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Control Panel")),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE4F4FF),
-              shape: BoxShape.circle,
+      appBar: AppBar(title: const Text('Control Panel')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              isConnected ? 'BLE: Connected' : 'BLE: Disconnected',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            child: Center(
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 40,
-                height: 40,
-              ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: isConnecting
+                  ? null
+                  : () async {
+                      if (!isConnected) {
+                        await connectBle();
+                      } else {
+                        await _device?.disconnect();
+                        setState(() {
+                          isConnected = false;
+                          _speedChar = null;
+                        });
+                      }
+                    },
+              child: Text(isConnected ? 'Disconnect BLE' : 'Connect BLE'),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Fan Speed: ${fanSpeed.toStringAsFixed(0)}%",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Slider(
-            value: fanSpeed,
-            min: 0,
-            max: 100,
-            divisions: 100,
-            label: fanSpeed.toStringAsFixed(0),
-            onChanged: (value) {
-              setState(() {
-                fanSpeed = value;
-                if (value > 0) {
-                  lastSpeed = value;
-                  isOn = true;
-                } else {
-                  isOn = false;
-                }
-              });
-              sendFanSpeed(value);
-            },
-          ),
-          const SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                if (isOn) {
-                  // Turn off: set speed to 0
-                  fanSpeed = 0.0;
-                  isOn = false;
-                } else {
-                  // Turn on: restore last speed
-                  fanSpeed = lastSpeed;
-                  isOn = true;
-                }
-              });
-              sendFanSpeed(fanSpeed);
-            },
-            child: Text(isOn ? "On" : "Off"),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Text('Fan Speed: ${fanSpeed.toStringAsFixed(0)}%'),
+            Slider(
+              value: fanSpeed,
+              min: 0,
+              max: 100,
+              divisions: 100,
+              onChanged: isConnected
+                  ? (value) async {
+                      setState(() {
+                        fanSpeed = value;
+                        if (value > 0) {
+                          isOn = true;
+                          lastSpeed = value;
+                        } else {
+                          isOn = false;
+                        }
+                      });
+                      await sendFanSpeedBle(value);
+                    }
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: isConnected ? togglePower : null,
+              child: Text(isOn ? 'On' : 'Off'),
+            ),
+          ],
+        ),
       ),
     );
   }
