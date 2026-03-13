@@ -1,6 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class ControlPanel extends StatefulWidget {
@@ -21,7 +20,8 @@ class _ControlPanelState extends State<ControlPanel> {
   BluetoothDevice? _device;
   BluetoothCharacteristic? _speedChar;
 
-  static const String deviceName = 'NanoESP32Fan';
+  // temp name
+  static const String deviceName = 'NanoESP32_Fan';
   static final Guid serviceUuid = Guid('12345678-1234-1234-1234-1234567890ab');
   static final Guid speedCharUuid = Guid(
     'abcdefab-1234-1234-1234-abcdefabcdef',
@@ -30,39 +30,68 @@ class _ControlPanelState extends State<ControlPanel> {
   static const Color _fanButtonColor = Color(0xFF065791);
   static const Color _unselectedButtonColor = Color(0xFFFFFFFF);
 
-  @override
-  void dispose() {
-    _device?.disconnect();
-    super.dispose();
+  Future<BluetoothDevice?> _scanForNamedDevice({
+    Duration timeout = const Duration(seconds: 8),
+  }) async {
+    final completer = Completer<BluetoothDevice?>();
+
+    final sub = FlutterBluePlus.onScanResults.listen((results) {
+      for (final r in results) {
+        if (r.device.platformName == deviceName && !completer.isCompleted) {
+          completer.complete(r.device);
+          break;
+        }
+      }
+    });
+
+    await FlutterBluePlus.startScan();
+
+    final found = await completer.future.timeout(
+      timeout,
+      onTimeout: () => null,
+    );
+
+    await FlutterBluePlus.stopScan();
+    await sub.cancel();
+
+    return found;
   }
 
   Future<void> connectBle() async {
     setState(() => isConnecting = true);
 
-    ScanResult? found;
-    final sub = FlutterBluePlus.scanResults.listen((results) {
-      for (final r in results) {
-        if (r.device.platformName == deviceName) {
-          found = r;
-        }
-      }
-    });
-
     try {
-      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 6));
-      await Future.delayed(const Duration(seconds: 6));
-      await FlutterBluePlus.stopScan();
+      await FlutterBluePlus.adapterState
+          .where((s) => s == BluetoothAdapterState.on)
+          .first
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () => throw Exception('Bluetooth adapter not ready'),
+          );
 
-      if (found == null) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('BLE device not found')));
+      // Auto-connect by hardcoded device name
+      final picked = await _scanForNamedDevice();
+      if (!mounted) return;
+
+      if (picked == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Device "$deviceName" not found')),
+        );
         return;
       }
 
-      _device = found!.device;
+      _device = picked;
       await _device!.connect(timeout: const Duration(seconds: 8));
+
+      _device!.connectionState.listen((state) {
+        if (state == BluetoothConnectionState.disconnected && mounted) {
+          setState(() {
+            isConnected = false;
+            _speedChar = null;
+            isOn = false;
+          });
+        }
+      });
 
       final services = await _device!.discoverServices();
       for (final s in services) {
@@ -77,25 +106,35 @@ class _ControlPanelState extends State<ControlPanel> {
       }
 
       if (_speedChar == null) {
-        throw Exception('Speed characteristic not found');
+        throw Exception(
+          'Selected device does not expose required fan characteristic',
+        );
       }
 
       setState(() => isConnected = true);
     } catch (e) {
+      await FlutterBluePlus.stopScan();
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('BLE error: $e')));
     } finally {
-      await sub.cancel();
       if (mounted) setState(() => isConnecting = false);
     }
   }
 
+  String _speedToCommand(double speed) {
+    final v = speed.round();
+    if (v <= 0) return 'OFF';
+    if (v >= 90) return 'HIGH'; // High button (100)
+    if (v >= 45) return 'MED'; // Medium button (60)
+    return 'LOW'; // Low button (30)
+  }
+
   Future<void> sendFanSpeedBle(double speed) async {
     if (_speedChar == null) return;
-    final v = speed.clamp(0, 100).round();
-    await _speedChar!.write([v], withoutResponse: true);
+    final command = _speedToCommand(speed);
+    await _speedChar!.write(command.codeUnits, withoutResponse: false);
   }
 
   Future<void> setFanPreset(double speed) async {
