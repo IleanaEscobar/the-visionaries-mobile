@@ -27,6 +27,9 @@ class _ControlPanelState extends State<ControlPanel> {
     'abcdefab-1234-1234-1234-abcdefabcdef',
   );
 
+  static const Color _fanButtonColor = Color(0xFF065791);
+  static const Color _unselectedButtonColor = Color(0xFFFFFFFF);
+
   @override
   void dispose() {
     _device?.disconnect();
@@ -95,6 +98,15 @@ class _ControlPanelState extends State<ControlPanel> {
     await _speedChar!.write([v], withoutResponse: true);
   }
 
+  Future<void> setFanPreset(double speed) async {
+    setState(() {
+      fanSpeed = speed;
+      lastSpeed = speed;
+      isOn = speed > 0;
+    });
+    await sendFanSpeedBle(speed);
+  }
+
   Future<void> togglePower() async {
     setState(() {
       if (isOn) {
@@ -102,11 +114,39 @@ class _ControlPanelState extends State<ControlPanel> {
         fanSpeed = 0;
         isOn = false;
       } else {
-        fanSpeed = lastSpeed; // restore previous speed
+        fanSpeed = lastSpeed;
         isOn = fanSpeed > 0;
       }
     });
     await sendFanSpeedBle(fanSpeed);
+  }
+
+  Widget _buildSpeedButton({
+    required String label,
+    required double speed,
+    required bool enabled,
+  }) {
+    final isSelected = isOn && fanSpeed.round() == speed.round();
+
+    return Center(
+      child: SizedBox(
+        width: 96,
+        height: 96,
+        child: ElevatedButton(
+          onPressed: enabled ? () => setFanPreset(speed) : null,
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            side: const BorderSide(color: _fanButtonColor, width: 1),
+            backgroundColor: isSelected
+                ? _fanButtonColor
+                : _unselectedButtonColor,
+            foregroundColor: isSelected ? Colors.white : _fanButtonColor,
+            padding: EdgeInsets.zero,
+          ),
+          child: Text(label, textAlign: TextAlign.center),
+        ),
+      ),
+    );
   }
 
   @override
@@ -117,7 +157,9 @@ class _ControlPanelState extends State<ControlPanel> {
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Temporarily commented out BLE-only UI for local button testing.
             Text(
               isConnected ? 'BLE: Connected' : 'BLE: Disconnected',
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -140,31 +182,20 @@ class _ControlPanelState extends State<ControlPanel> {
               child: Text(isConnected ? 'Disconnect BLE' : 'Connect BLE'),
             ),
             const SizedBox(height: 24),
-            Text('Fan Speed: ${fanSpeed.toStringAsFixed(0)}%'),
-            Slider(
-              value: fanSpeed,
-              min: 0,
-              max: 100,
-              divisions: 100,
-              onChanged: isConnected
-                  ? (value) async {
-                      setState(() {
-                        fanSpeed = value;
-                        if (value > 0) {
-                          isOn = true;
-                          lastSpeed = value;
-                        } else {
-                          isOn = false;
-                        }
-                      });
-                      await sendFanSpeedBle(value);
-                    }
-                  : null,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: isConnected ? togglePower : null,
-              child: Text(isOn ? 'On' : 'Off'),
+            _buildSpeedButton(label: 'High', speed: 100, enabled: isConnected),
+            const SizedBox(height: 12),
+            _buildSpeedButton(label: 'Medium', speed: 60, enabled: isConnected),
+            const SizedBox(height: 12),
+            _buildSpeedButton(label: 'Low', speed: 30, enabled: isConnected),
+
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 180,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: isConnected ? togglePower : null,
+                child: Text(isOn ? 'Off' : 'On'),
+              ),
             ),
           ],
         ),

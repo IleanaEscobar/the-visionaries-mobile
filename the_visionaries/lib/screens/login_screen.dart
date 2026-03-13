@@ -92,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
             ),
+            // commented out dev only button for prototype
             const SizedBox(height: 10),
             // DEV ONLY BUTTON
             TextButton(
