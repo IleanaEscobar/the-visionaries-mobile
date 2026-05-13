@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import '../services/app_language.dart';
+import '../services/app_theme.dart';
+import 'settings_menu_screen.dart';
 
 class ControlPanel extends StatefulWidget {
   const ControlPanel({super.key});
@@ -16,6 +19,7 @@ class _ControlPanelState extends State<ControlPanel> {
 
   bool isConnecting = false;
   bool isConnected = false;
+  bool _dismissedNoBlePopupForDev = false;
 
   BluetoothDevice? _device;
   BluetoothCharacteristic? _speedChar;
@@ -27,8 +31,19 @@ class _ControlPanelState extends State<ControlPanel> {
     'abcdefab-1234-1234-1234-abcdefabcdef',
   );
 
-  static const Color _fanButtonColor = Color(0xFF065791);
-  static const Color _unselectedButtonColor = Color(0xFFFFFFFF);
+  Future<void> _handleBleTap() async {
+    if (isConnecting) return;
+    if (!isConnected) {
+      await connectBle();
+    } else {
+      await _device?.disconnect();
+      if (!mounted) return;
+      setState(() {
+        isConnected = false;
+        _speedChar = null;
+      });
+    }
+  }
 
   Future<BluetoothDevice?> _scanForNamedDevice({
     Duration timeout = const Duration(seconds: 8),
@@ -75,7 +90,14 @@ class _ControlPanelState extends State<ControlPanel> {
 
       if (picked == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Device "$deviceName" not found')),
+          SnackBar(
+            content: Text(
+              context.tr(
+                'device_not_found',
+                params: {'deviceName': deviceName},
+              ),
+            ),
+          ),
         );
         return;
       }
@@ -89,6 +111,7 @@ class _ControlPanelState extends State<ControlPanel> {
             isConnected = false;
             _speedChar = null;
             isOn = false;
+            _dismissedNoBlePopupForDev = false;
           });
         }
       });
@@ -112,13 +135,18 @@ class _ControlPanelState extends State<ControlPanel> {
         );
       }
 
-      setState(() => isConnected = true);
+      setState(() {
+        isConnected = true;
+        _dismissedNoBlePopupForDev = false;
+      });
     } catch (e) {
       await FlutterBluePlus.stopScan();
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('BLE error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.tr('ble_error', params: {'error': '$e'})),
+        ),
+      );
     } finally {
       if (mounted) setState(() => isConnecting = false);
     }
@@ -165,25 +193,49 @@ class _ControlPanelState extends State<ControlPanel> {
     required String label,
     required double speed,
     required bool enabled,
+    required bool isDark,
   }) {
     final isSelected = isOn && fanSpeed.round() == speed.round();
+    final baseBackground = isDark
+        ? const Color(0xFF1F2126)
+        : const Color(0xFFDCE6F2);
+    final selectedBackground = isDark
+        ? const Color(0xFF2A4D7E)
+        : const Color(0xFFB9D4F1);
+    final textColor = isDark ? Colors.white : Colors.black;
+    final shadowColor = isDark
+        ? const Color(0x00000000)
+        : const Color(0x1F4A7FAF);
 
     return Center(
       child: SizedBox(
-        width: 96,
-        height: 96,
+        width: 300,
+        height: 74,
         child: ElevatedButton(
           onPressed: enabled ? () => setFanPreset(speed) : null,
           style: ElevatedButton.styleFrom(
-            shape: const CircleBorder(),
-            side: const BorderSide(color: _fanButtonColor, width: 1),
-            backgroundColor: isSelected
-                ? _fanButtonColor
-                : _unselectedButtonColor,
-            foregroundColor: isSelected ? Colors.white : _fanButtonColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            backgroundColor: isSelected ? selectedBackground : baseBackground,
+            foregroundColor: textColor,
+            disabledBackgroundColor: isSelected
+                ? selectedBackground.withValues(alpha: 0.65)
+                : baseBackground.withValues(alpha: 0.65),
+            disabledForegroundColor: textColor.withValues(alpha: 0.6),
+            elevation: 0,
+            shadowColor: shadowColor,
             padding: EdgeInsets.zero,
           ),
-          child: Text(label, textAlign: TextAlign.center),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 40 / 2,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+          ),
         ),
       ),
     );
@@ -191,54 +243,325 @@ class _ControlPanelState extends State<ControlPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Control Panel')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Temporarily commented out BLE-only UI for local button testing.
-            Text(
-              isConnected ? 'BLE: Connected' : 'BLE: Disconnected',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: isConnecting
-                  ? null
-                  : () async {
-                      if (!isConnected) {
-                        await connectBle();
-                      } else {
-                        await _device?.disconnect();
-                        setState(() {
-                          isConnected = false;
-                          _speedChar = null;
-                        });
-                      }
-                    },
-              child: Text(isConnected ? 'Disconnect BLE' : 'Connect BLE'),
-            ),
-            const SizedBox(height: 24),
-            _buildSpeedButton(label: 'High', speed: 100, enabled: isConnected),
-            const SizedBox(height: 12),
-            _buildSpeedButton(label: 'Medium', speed: 60, enabled: isConnected),
-            const SizedBox(height: 12),
-            _buildSpeedButton(label: 'Low', speed: 30, enabled: isConnected),
+    final bleConnectedText = context.tr('ble_connected');
+    final bleDisconnectedText = context.tr('ble_disconnected');
+    final highText = context.tr('speed_high');
+    final mediumText = context.tr('speed_medium');
+    final lowText = context.tr('speed_low');
+    final fanStatusLabel = context.tr('fan_status_label');
+    final fanStatusOn = context.tr('fan_status_on');
+    final fanStatusOff = context.tr('fan_status_off');
+    final popupMessageText = context.tr('control_popup_message');
+    final popupConnectText = context.tr('control_popup_connect_device');
+    final popupSkipText = context.tr('control_popup_skip_dev');
+    final showNoBlePopup = !isConnected && !_dismissedNoBlePopupForDev;
+    final isDark = context.appTheme.isDark;
 
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 180,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: isConnected ? togglePower : null,
-                child: Text(isOn ? 'Off' : 'On'),
+    final backgroundColor = isDark
+        ? const Color(0xFF3A3B3F)
+        : const Color(0xFFEAF4FC);
+    final cardShadow = isDark
+        ? const Color(0x00000000)
+        : const Color(0x1F4A7FAF);
+    final headingColor = isDark
+        ? const Color(0xFFE8EFF8)
+        : const Color(0xFF637382);
+    final iconColor = isDark
+        ? const Color(0xFFD8E8F9)
+        : const Color(0xFF1A69B2);
+    final powerBg = isDark ? const Color(0xFF202226) : const Color(0xFFDCE6F2);
+    final powerIcon = isDark
+        ? const Color(0xFF8D9298)
+        : const Color(0xFF2E69BA);
+    final bleColor = isConnected
+        ? (isDark ? const Color(0xFFE4F4FF) : const Color(0xFF1C84D3))
+        : (isDark ? const Color(0xFF9FA6AE) : const Color(0xFF7B90A8));
+    final fanStatusText =
+        '$fanStatusLabel: ${isOn ? fanStatusOn : fanStatusOff}';
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 380),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 18,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Container(
+                        width: 240,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFFEBEDF0)
+                              : const Color(0xFF1E549A),
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: cardShadow,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(32),
+                          child: Stack(
+                            children: [
+                              AnimatedPositioned(
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeInOut,
+                                left: isDark ? 120.0 : 5.0,
+                                top: 2.5,
+                                child: Container(
+                                  width: 115,
+                                  height: 59,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF1F2126)
+                                        : const Color(0xFFBFD8F1),
+                                    borderRadius: BorderRadius.circular(32),
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () =>
+                                          context.appTheme.setDark(false),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.wb_sunny_outlined,
+                                          color: isDark
+                                              ? const Color(0xFF1B1F24)
+                                              : const Color(0xFF1F6CC0),
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () =>
+                                          context.appTheme.setDark(true),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.nightlight_round,
+                                          color: isDark
+                                              ? const Color(0xFFE4EEF9)
+                                              : const Color(0xFFE8F1FB),
+                                          size: 30,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        fanStatusText,
+                        style: TextStyle(
+                          color: headingColor,
+                          fontSize: 23 / 2,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      _buildSpeedButton(
+                        label: lowText,
+                        speed: 30,
+                        enabled: isConnected,
+                        isDark: isDark,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSpeedButton(
+                        label: mediumText,
+                        speed: 60,
+                        enabled: isConnected,
+                        isDark: isDark,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildSpeedButton(
+                        label: highText,
+                        speed: 100,
+                        enabled: isConnected,
+                        isDark: isDark,
+                      ),
+                      const SizedBox(height: 26),
+                      SizedBox(
+                        width: 98,
+                        height: 98,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: powerBg,
+                            boxShadow: [
+                              BoxShadow(
+                                color: cardShadow,
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: isConnected ? togglePower : null,
+                            iconSize: 52,
+                            color: powerIcon,
+                            disabledColor: powerIcon.withValues(alpha: 0.5),
+                            icon: const Icon(Icons.power_settings_new),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      GestureDetector(
+                        onTap: _handleBleTap,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.circle, size: 12, color: bleColor),
+                              const SizedBox(width: 10),
+                              Text(
+                                isConnected
+                                    ? bleConnectedText
+                                    : bleDisconnectedText,
+                                style: TextStyle(
+                                  color: bleColor,
+                                  fontSize: 27 / 2,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Icon(Icons.bluetooth, color: bleColor, size: 26),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 51,
+            left: 38,
+            width: 38,
+            height: 20,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsMenuScreen()),
+              ),
+              child: Icon(Icons.menu, color: iconColor, size: 33),
+            ),
+          ),
+          if (showNoBlePopup) ...[
+            const Positioned.fill(
+              child: ModalBarrier(dismissible: false, color: Color(0x993F6E99)),
+            ),
+            Positioned.fill(
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEAF4FC),
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x22000000),
+                        blurRadius: 18,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.bluetooth,
+                        size: 78,
+                        color: Color(0xFF065791),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        popupMessageText,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          height: 1.25,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF0B2140),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 58,
+                        child: ElevatedButton(
+                          onPressed: isConnecting ? null : connectBle,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1A4A8C),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: isConnecting
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  popupConnectText,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _dismissedNoBlePopupForDev = true);
+                        },
+                        child: Text(popupSkipText),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
