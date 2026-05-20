@@ -71,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final userIdText = context.tr('login_user_id');
     final passwordText = context.tr('login_password');
     final loginText = context.tr('login_button');
-    final devSkipText = context.tr('dev_skip_control');
 
     return Scaffold(
       body: SafeArea(
@@ -215,19 +214,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 457,
-              left: 31,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/control');
-                },
-                child: Text(
-                  devSkipText,
-                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
             ),

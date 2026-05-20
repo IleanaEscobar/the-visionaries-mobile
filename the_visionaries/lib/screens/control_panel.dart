@@ -19,7 +19,6 @@ class _ControlPanelState extends State<ControlPanel> {
 
   bool isConnecting = false;
   bool isConnected = false;
-  bool _dismissedNoBlePopupForDev = false;
 
   BluetoothDevice? _device;
   BluetoothCharacteristic? _speedChar;
@@ -111,7 +110,6 @@ class _ControlPanelState extends State<ControlPanel> {
             isConnected = false;
             _speedChar = null;
             isOn = false;
-            _dismissedNoBlePopupForDev = false;
           });
         }
       });
@@ -137,7 +135,6 @@ class _ControlPanelState extends State<ControlPanel> {
 
       setState(() {
         isConnected = true;
-        _dismissedNoBlePopupForDev = false;
       });
     } catch (e) {
       await FlutterBluePlus.stopScan();
@@ -253,8 +250,7 @@ class _ControlPanelState extends State<ControlPanel> {
     final fanStatusOff = context.tr('fan_status_off');
     final popupMessageText = context.tr('control_popup_message');
     final popupConnectText = context.tr('control_popup_connect_device');
-    final popupSkipText = context.tr('control_popup_skip_dev');
-    final showNoBlePopup = !isConnected && !_dismissedNoBlePopupForDev;
+    final showNoBlePopup = !isConnected;
     final isDark = context.appTheme.isDark;
 
     final backgroundColor = isDark
@@ -458,14 +454,6 @@ class _ControlPanelState extends State<ControlPanel> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamedAndRemoveUntil('/', (_) => false);
-                        },
-                        child: const Text('DEV: Back to Start'),
-                      ),
                     ],
                   ),
                 ),
@@ -558,20 +546,6 @@ class _ControlPanelState extends State<ControlPanel> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      TextButton(
-                        onPressed: () {
-                          setState(() => _dismissedNoBlePopupForDev = true);
-                        },
-                        child: Text(popupSkipText),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamedAndRemoveUntil('/', (_) => false);
-                        },
-                        child: const Text('DEV: Back to Start'),
-                      ),
                     ],
                   ),
                 ),
