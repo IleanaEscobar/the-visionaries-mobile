@@ -457,6 +457,15 @@ class _ControlPanelState extends State<ControlPanel> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (_) => false);
+                        },
+                        child: const Text('DEV: Back to Start'),
+                      ),
                     ],
                   ),
                 ),
@@ -554,6 +563,14 @@ class _ControlPanelState extends State<ControlPanel> {
                           setState(() => _dismissedNoBlePopupForDev = true);
                         },
                         child: Text(popupSkipText),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamedAndRemoveUntil('/', (_) => false);
+                        },
+                        child: const Text('DEV: Back to Start'),
                       ),
                     ],
                   ),

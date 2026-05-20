@@ -42,26 +42,59 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       return;
     }
 
+    if (newPass.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password must be at least 6 characters')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
-      final user = FirebaseAuth.instance.currentUser!;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.email == null) {
+        throw FirebaseAuthException(
+          code: 'no-user',
+          message: 'No user is currently signed in.',
+        );
+      }
+
       final credential = EmailAuthProvider.credential(
         email: user.email!,
         password: current,
       );
       await user.reauthenticateWithCredential(credential);
       await user.updatePassword(newPass);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.tr('change_password_success'))),
         );
+        _currentController.clear();
+        _newController.clear();
+        _confirmController.clear();
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
+        String message = e.message ?? e.code;
+        if (e.code == 'wrong-password') {
+          message = 'Current password is incorrect.';
+        } else if (e.code == 'weak-password') {
+          message = 'New password is too weak. Use a stronger password.';
+        } else if (e.code == 'requires-recent-login') {
+          message =
+              'Please log out and log back in before changing your password.';
+        }
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(e.message ?? e.code)));
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

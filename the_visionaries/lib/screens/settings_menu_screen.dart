@@ -147,7 +147,7 @@ class SettingsMenuScreen extends StatelessWidget {
   Future<void> _logOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     if (context.mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil('/start', (_) => false);
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (_) => false);
     }
   }
 }

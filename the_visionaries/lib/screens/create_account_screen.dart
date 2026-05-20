@@ -62,12 +62,20 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     try {
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: pass);
-      await LanguagePreferenceService.saveUserLanguage(
-        uid: credential.user!.uid,
-        language: _selectedLanguage,
-        fullName: _fullNameController.text.trim(),
-        email: email,
-      );
+
+      // Try to save language preferences, but do not block account creation.
+      try {
+        await LanguagePreferenceService.saveUserLanguage(
+          uid: credential.user!.uid,
+          language: _selectedLanguage,
+          fullName: _fullNameController.text.trim(),
+          email: email,
+        );
+      } catch (e) {
+        // Log preference save failure but continue; user can set language in settings.
+        debugPrint('Failed to save language preference: $e');
+      }
+
       languageController.setLanguage(_selectedLanguage);
       if (mounted) {
         Navigator.pushNamed(context, '/control');
@@ -107,19 +115,25 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Terms and Agreements',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black,
+                      Expanded(
+                        child: Text(
+                          'Terms and Agreements',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, color: Colors.black),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close, color: Colors.black),
+                          padding: EdgeInsets.zero,
+                          alignment: Alignment.center,
+                        ),
                       ),
                     ],
                   ),
@@ -242,7 +256,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        setState(() => _agreedToTerms = true);
+                        Navigator.of(context).pop();
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF24579D),
                         shape: RoundedRectangleBorder(

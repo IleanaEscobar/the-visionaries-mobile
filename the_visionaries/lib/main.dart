@@ -13,7 +13,17 @@ import 'services/language_preference_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    // On iOS, hot restart / scene lifecycle can occasionally attempt default
+    // app initialization more than once in quick succession.
+    if (e.code != 'duplicate-app') rethrow;
+  }
+
   runApp(const MyApp());
 }
 

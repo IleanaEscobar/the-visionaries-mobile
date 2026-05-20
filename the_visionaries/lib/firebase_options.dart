@@ -49,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '734456671677',
     projectId: 'the-visionaries-mobile',
     authDomain: 'the-visionaries-mobile.firebaseapp.com',
+    databaseURL: 'https://the-visionaries-mobile-default-rtdb.firebaseio.com',
     storageBucket: 'the-visionaries-mobile.firebasestorage.app',
   );
 
@@ -57,6 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:734456671677:android:992fc092296ece97ee36d4',
     messagingSenderId: '734456671677',
     projectId: 'the-visionaries-mobile',
+    databaseURL: 'https://the-visionaries-mobile-default-rtdb.firebaseio.com',
     storageBucket: 'the-visionaries-mobile.firebasestorage.app',
   );
 
@@ -65,6 +67,7 @@ class DefaultFirebaseOptions {
     appId: '1:734456671677:ios:1e7efafb6b176e2fee36d4',
     messagingSenderId: '734456671677',
     projectId: 'the-visionaries-mobile',
+    databaseURL: 'https://the-visionaries-mobile-default-rtdb.firebaseio.com',
     storageBucket: 'the-visionaries-mobile.firebasestorage.app',
     iosBundleId: 'com.example.theVisionaries',
   );
@@ -74,6 +77,7 @@ class DefaultFirebaseOptions {
     appId: '1:734456671677:ios:1e7efafb6b176e2fee36d4',
     messagingSenderId: '734456671677',
     projectId: 'the-visionaries-mobile',
+    databaseURL: 'https://the-visionaries-mobile-default-rtdb.firebaseio.com',
     storageBucket: 'the-visionaries-mobile.firebasestorage.app',
     iosBundleId: 'com.example.theVisionaries',
   );

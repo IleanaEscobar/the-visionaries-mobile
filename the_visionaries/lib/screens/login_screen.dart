@@ -33,10 +33,15 @@ class _LoginScreenState extends State<LoginScreen> {
         email: userId,
         password: pass,
       );
-      final savedLanguage = await LanguagePreferenceService.getUserLanguage(
-        credential.user!.uid,
-      );
-      languageController.setLanguage(savedLanguage);
+
+      // Do not block successful login if preferences are temporarily unreadable.
+      try {
+        final savedLanguage = await LanguagePreferenceService.getUserLanguage(
+          credential.user!.uid,
+        );
+        languageController.setLanguage(savedLanguage);
+      } catch (_) {}
+
       if (mounted) {
         Navigator.pushNamed(context, '/control');
       }
