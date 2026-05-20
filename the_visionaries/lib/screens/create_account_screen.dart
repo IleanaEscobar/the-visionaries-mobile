@@ -366,7 +366,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     final userIdText = context.tr('create_user_id');
     final passwordText = context.tr('create_password');
     final confirmPasswordText = context.tr('create_confirm_password');
-    final hipaaText = context.tr('hipaa_note');
     final createButtonText = context.tr('create_button');
 
     return Scaffold(
@@ -507,11 +506,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                hipaaText,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF6E6E6E)),
               ),
               const SizedBox(height: 16),
               Center(
