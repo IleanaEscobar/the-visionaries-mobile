@@ -1,6 +1,6 @@
 {
-    "name": "the_visionaries",
-    "short_name": "the_visionaries",
+    "name": "VentiFlow",
+    "short_name": "VentiFlow",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
