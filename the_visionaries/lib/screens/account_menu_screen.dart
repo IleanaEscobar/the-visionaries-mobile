@@ -3,6 +3,7 @@ import '../services/app_language.dart';
 import '../services/app_theme.dart';
 import 'change_username_screen.dart';
 import 'change_password_screen.dart';
+import 'delete_account_screen.dart';
 
 class AccountMenuScreen extends StatelessWidget {
   const AccountMenuScreen({super.key});
@@ -85,6 +86,19 @@ class AccountMenuScreen extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+              ),
+            ),
+
+            _AccountItem(
+              icon: Icons.delete_forever_outlined,
+              label: context.tr('account_delete_account'),
+              iconColor: iconColor,
+              textColor: itemColor,
+              chevronColor: chevronColor,
+              dividerColor: dividerColor,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DeleteAccountScreen()),
               ),
             ),
           ],

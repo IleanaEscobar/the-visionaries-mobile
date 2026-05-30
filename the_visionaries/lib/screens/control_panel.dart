@@ -4,6 +4,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../services/app_language.dart';
 import '../services/app_theme.dart';
 import 'settings_menu_screen.dart';
+import 'delete_account_screen.dart';
 
 class ControlPanel extends StatefulWidget {
   const ControlPanel({super.key});
@@ -250,6 +251,7 @@ class _ControlPanelState extends State<ControlPanel> {
     final fanStatusOff = context.tr('fan_status_off');
     final popupMessageText = context.tr('control_popup_message');
     final popupConnectText = context.tr('control_popup_connect_device');
+    final popupDeleteAccountText = context.tr('delete_account_button');
     final showNoBlePopup = !isConnected;
     final isDark = context.appTheme.isDark;
 
@@ -543,6 +545,33 @@ class _ControlPanelState extends State<ControlPanel> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DeleteAccountScreen(),
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFFB71C1C),
+                            side: const BorderSide(color: Color(0xFFB71C1C)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: Text(
+                            popupDeleteAccountText,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),
