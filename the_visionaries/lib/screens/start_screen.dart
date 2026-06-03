@@ -6,6 +6,10 @@ class StartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final buttonWidth = isTablet ? 380.0 : double.infinity;
+
     final loginText = context.tr('start_login');
     final continueText = context.tr('start_continue');
 
@@ -20,71 +24,80 @@ class StartScreen extends StatelessWidget {
             colors: [Color(0xFF4A90E2), Color(0xFFF4F7FC)],
           ),
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 236,
-              left: 127,
-              child: Image.asset(
-                'assets/images/logo.png',
-                width: 148,
-                height: 145,
-                opacity: const AlwaysStoppedAnimation(1.0),
-              ),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              isTablet ? 0 : 24,
+              isTablet ? 36 : 24,
+              isTablet ? 0 : 24,
+              isTablet ? 36 : 24,
             ),
-            Positioned(
-              top: 581,
-              left: 31,
-              child: SizedBox(
-                width: 340,
-                height: 65,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/login'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A4A8C),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Spacer(flex: 2),
+                Center(
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: isTablet ? 210 : 148,
+                    height: isTablet ? 206 : 145,
+                    opacity: const AlwaysStoppedAnimation(1.0),
                   ),
-                  child: Text(
-                    loginText,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
+                ),
+                const Spacer(flex: 3),
+                Center(
+                  child: SizedBox(
+                    width: buttonWidth,
+                    height: isTablet ? 72 : 65,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/login'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A4A8C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: Text(
+                        loginText,
+                        style: TextStyle(
+                          fontSize: isTablet ? 20 : 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            Positioned(
-              top: 667,
-              left: 31,
-              child: SizedBox(
-                width: 340,
-                height: 65,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(context, '/create'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A4A8C),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: Text(
-                    continueText,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
+                const SizedBox(height: 18),
+                Center(
+                  child: SizedBox(
+                    width: buttonWidth,
+                    height: isTablet ? 72 : 65,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/create'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A4A8C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 4,
+                      ),
+                      child: Text(
+                        continueText,
+                        style: TextStyle(
+                          fontSize: isTablet ? 20 : 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                const Spacer(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

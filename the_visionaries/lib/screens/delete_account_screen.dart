@@ -76,6 +76,11 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final contentMaxWidth = isTablet ? 700.0 : double.infinity;
+    final titleSize = isTablet ? 24.0 : 20.0;
+
     final isDark = context.appTheme.isDark;
     final bg = isDark ? const Color(0xFF3F3F42) : Colors.white;
     final titleColor = isDark
@@ -102,7 +107,11 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: titleColor, size: 26),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: titleColor,
+                      size: isTablet ? 30 : 26,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -111,138 +120,148 @@ class _DeleteAccountScreenState extends State<DeleteAccountScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: titleColor,
-                        fontSize: 20,
+                        fontSize: titleSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  SizedBox(width: isTablet ? 56 : 48),
                 ],
               ),
             ),
             Divider(color: dividerColor, thickness: 1.2, height: 1),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      context.tr('delete_account_description'),
-                      style: TextStyle(
-                        color: labelColor,
-                        fontSize: 15,
-                        height: 1.4,
-                      ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      isTablet ? 32 : 24,
+                      24,
+                      isTablet ? 32 : 24,
+                      24,
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      context.tr('delete_account_current_password'),
-                      style: TextStyle(
-                        color: labelColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: context.tr('change_password_current'),
-                        hintStyle: TextStyle(
-                          color: isDark
-                              ? const Color(0xFFB0B0B0)
-                              : const Color(0xFF8A8A8A),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 14,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: inputBorder),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(color: inputBorder),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide(
-                            color: inputBorder,
-                            width: 1.4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          context.tr('delete_account_description'),
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: isTablet ? 17 : 15,
+                            height: 1.4,
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _deleteAccount,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB71C1C),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                context.tr('delete_account_button'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      height: 54,
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: isDark
-                              ? const Color(0xFF121212)
-                              : const Color(0xFF1A4A8C),
-                          backgroundColor: isDark
-                              ? const Color(0xFFD9D9D9)
-                              : Colors.transparent,
-                          side: BorderSide(
-                            color: isDark
-                                ? const Color(0xFFD9D9D9)
-                                : const Color(0xFF1A4A8C),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: Text(
-                          context.tr('change_password_cancel'),
-                          style: const TextStyle(
-                            fontSize: 16,
+                        const SizedBox(height: 20),
+                        Text(
+                          context.tr('delete_account_current_password'),
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: isTablet ? 16 : 14,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: true,
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: context.tr('change_password_current'),
+                            hintStyle: TextStyle(
+                              color: isDark
+                                  ? const Color(0xFFB0B0B0)
+                                  : const Color(0xFF8A8A8A),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 14,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: BorderSide(color: inputBorder),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: BorderSide(color: inputBorder),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                              borderSide: BorderSide(
+                                color: inputBorder,
+                                width: 1.4,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+                        SizedBox(
+                          height: isTablet ? 58 : 54,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _deleteAccount,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFB71C1C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    context.tr('delete_account_button'),
+                                    style: TextStyle(
+                                      fontSize: isTablet ? 18 : 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: isTablet ? 58 : 54,
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: isDark
+                                  ? const Color(0xFF121212)
+                                  : const Color(0xFF1A4A8C),
+                              backgroundColor: isDark
+                                  ? const Color(0xFFD9D9D9)
+                                  : Colors.transparent,
+                              side: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFFD9D9D9)
+                                    : const Color(0xFF1A4A8C),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            child: Text(
+                              context.tr('change_password_cancel'),
+                              style: TextStyle(
+                                fontSize: isTablet ? 18 : 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

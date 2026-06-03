@@ -7,6 +7,11 @@ class BluetoothSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final contentMaxWidth = isTablet ? 700.0 : double.infinity;
+    final titleSize = isTablet ? 24.0 : 20.0;
+
     final isDark = context.appTheme.isDark;
     final bg = isDark ? const Color(0xFF3F3F42) : Colors.white;
     final titleColor = isDark
@@ -22,81 +27,90 @@ class BluetoothSettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back, color: titleColor, size: 26),
-                    onPressed: () => Navigator.pop(context),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: contentMaxWidth),
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: titleColor,
+                          size: isTablet ? 30 : 26,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      Expanded(
+                        child: Text(
+                          context.tr('bluetooth_title'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: titleColor,
+                            fontSize: titleSize,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: isTablet ? 56 : 48),
+                    ],
                   ),
-                  Expanded(
-                    child: Text(
-                      context.tr('bluetooth_title'),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: titleColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                ),
+                Divider(color: dividerColor, thickness: 1.2, height: 1),
+                SizedBox(height: isTablet ? 56 : 40),
+
+                Icon(
+                  Icons.bluetooth,
+                  size: isTablet ? 92 : 72,
+                  color: isDark
+                      ? const Color(0xFFF2F2F2)
+                      : titleColor.withValues(alpha: 0.6),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  context.tr('ble_disconnected'),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: isTablet ? 19 : 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: isTablet ? 44 : 32),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isTablet ? 56 : 40),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: isTablet ? 58 : 54,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark
+                            ? const Color(0xFF202125)
+                            : const Color(0xFF1A4A8C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        context.tr('bluetooth_connect'),
+                        style: TextStyle(
+                          fontSize: isTablet ? 18 : 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
-                ],
-              ),
-            ),
-            Divider(color: dividerColor, thickness: 1.2, height: 1),
-            const SizedBox(height: 40),
-
-            Icon(
-              Icons.bluetooth,
-              size: 72,
-              color: isDark
-                  ? const Color(0xFFF2F2F2)
-                  : titleColor.withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              context.tr('ble_disconnected'),
-              style: TextStyle(
-                color: textColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? const Color(0xFF202125)
-                        : const Color(0xFF1A4A8C),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    context.tr('bluetooth_connect'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

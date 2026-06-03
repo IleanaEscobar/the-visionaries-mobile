@@ -103,6 +103,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final contentMaxWidth = isTablet ? 700.0 : double.infinity;
+    final titleSize = isTablet ? 24.0 : 20.0;
+
     final isDark = context.appTheme.isDark;
     final bg = isDark ? const Color(0xFF3F3F42) : Colors.white;
     final titleColor = isDark
@@ -131,7 +136,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: titleColor, size: 26),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: titleColor,
+                      size: isTablet ? 30 : 26,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -140,135 +149,145 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: titleColor,
-                        fontSize: 20,
+                        fontSize: titleSize,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  SizedBox(width: isTablet ? 56 : 48),
                 ],
               ),
             ),
             Divider(color: dividerColor, thickness: 1.2, height: 1),
 
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Description
-                    Text(
-                      context.tr('change_password_description'),
-                      style: TextStyle(
-                        color: labelColor,
-                        fontSize: 15,
-                        height: 1.4,
-                      ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: contentMaxWidth),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      isTablet ? 32 : 24,
+                      24,
+                      isTablet ? 32 : 24,
+                      24,
                     ),
-                    const SizedBox(height: 24),
-
-                    // Current Password
-                    _PasswordField(
-                      label: context.tr('change_password_current'),
-                      controller: _currentController,
-                      isDark: isDark,
-                      inputBorder: inputBorder,
-                      labelColor: labelColor,
-                      requiredColor: requiredColor,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // New Password
-                    _PasswordField(
-                      label: context.tr('change_password_new'),
-                      controller: _newController,
-                      isDark: isDark,
-                      inputBorder: inputBorder,
-                      labelColor: labelColor,
-                      requiredColor: requiredColor,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Confirm New Password
-                    _PasswordField(
-                      label: context.tr('change_password_confirm'),
-                      controller: _confirmController,
-                      isDark: isDark,
-                      inputBorder: inputBorder,
-                      labelColor: labelColor,
-                      requiredColor: requiredColor,
-                    ),
-                    const SizedBox(height: 28),
-
-                    // Change password button
-                    SizedBox(
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: isDark
-                              ? const Color(0xFF202125)
-                              : const Color(0xFF1A4A8C),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Description
+                        Text(
+                          context.tr('change_password_description'),
+                          style: TextStyle(
+                            color: labelColor,
+                            fontSize: isTablet ? 17 : 15,
+                            height: 1.4,
                           ),
-                          elevation: 0,
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                context.tr('change_password_button'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        const SizedBox(height: 24),
+
+                        // Current Password
+                        _PasswordField(
+                          label: context.tr('change_password_current'),
+                          controller: _currentController,
+                          isDark: isDark,
+                          inputBorder: inputBorder,
+                          labelColor: labelColor,
+                          requiredColor: requiredColor,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // New Password
+                        _PasswordField(
+                          label: context.tr('change_password_new'),
+                          controller: _newController,
+                          isDark: isDark,
+                          inputBorder: inputBorder,
+                          labelColor: labelColor,
+                          requiredColor: requiredColor,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Confirm New Password
+                        _PasswordField(
+                          label: context.tr('change_password_confirm'),
+                          controller: _confirmController,
+                          isDark: isDark,
+                          inputBorder: inputBorder,
+                          labelColor: labelColor,
+                          requiredColor: requiredColor,
+                        ),
+                        const SizedBox(height: 28),
+
+                        // Change password button
+                        SizedBox(
+                          height: isTablet ? 58 : 54,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDark
+                                  ? const Color(0xFF202125)
+                                  : const Color(0xFF1A4A8C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
                               ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    context.tr('change_password_button'),
+                                    style: TextStyle(
+                                      fontSize: isTablet ? 18 : 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
 
-                    // Cancel button
-                    SizedBox(
-                      height: 54,
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: isDark
-                              ? const Color(0xFF121212)
-                              : const Color(0xFF1A4A8C),
-                          backgroundColor: isDark
-                              ? const Color(0xFFD9D9D9)
-                              : Colors.transparent,
-                          side: BorderSide(
-                            color: isDark
-                                ? const Color(0xFFD9D9D9)
-                                : const Color(0xFF1A4A8C),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                        // Cancel button
+                        SizedBox(
+                          height: isTablet ? 58 : 54,
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: isDark
+                                  ? const Color(0xFF121212)
+                                  : const Color(0xFF1A4A8C),
+                              backgroundColor: isDark
+                                  ? const Color(0xFFD9D9D9)
+                                  : Colors.transparent,
+                              side: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFFD9D9D9)
+                                    : const Color(0xFF1A4A8C),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            child: Text(
+                              context.tr('change_password_cancel'),
+                              style: TextStyle(
+                                fontSize: isTablet ? 18 : 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          context.tr('change_password_cancel'),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -67,6 +67,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final formMaxWidth = isTablet ? 700.0 : 360.0;
+    final titleSize = isTablet ? 42.0 : 32.0;
+    final fieldHeight = isTablet ? 62.0 : 56.0;
+    final buttonHeight = isTablet ? 70.0 : 65.0;
+
     final welcomeText = context.tr('login_welcome_back');
     final userIdText = context.tr('login_user_id');
     final passwordText = context.tr('login_password');
@@ -74,150 +81,142 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Stack(
-          children: [
-            Positioned(
-              top: 12,
-              left: 8,
-              child: IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: const Icon(
-                  Icons.arrow_back_ios_new,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 80,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  welcomeText,
-                  style: const TextStyle(
-                    fontFamily: 'Source Sans 3',
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                    height: 1,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 168,
-              left: 30.5,
-              child: SizedBox(
-                width: 341,
-                height: 132,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 341,
-                      height: 56,
-                      child: TextField(
-                        controller: _userController,
-                        decoration: InputDecoration(
-                          labelText: userIdText,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            isTablet ? 32 : 16,
+            12,
+            isTablet ? 32 : 16,
+            24,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: formMaxWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: Icon(
+                        Icons.arrow_back_ios_new,
+                        color: const Color(0xFF1A1A1A),
+                        size: isTablet ? 30 : 24,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: 341,
-                      height: 56,
-                      child: TextField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: passwordText,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF065791),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        obscureText: true,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: 382,
-              left: 31,
-              child: SizedBox(
-                width: 340,
-                height: 65,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1A4A8C),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  ),
+                  SizedBox(height: isTablet ? 32 : 20),
+                  Text(
+                    welcomeText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Source Sans 3',
+                      fontSize: titleSize,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        )
-                      : Text(
-                          loginText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
+                  SizedBox(height: isTablet ? 48 : 36),
+                  SizedBox(
+                    height: fieldHeight,
+                    child: TextField(
+                      controller: _userController,
+                      decoration: InputDecoration(
+                        labelText: userIdText,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
                           ),
                         ),
-                ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: fieldHeight,
+                    child: TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: passwordText,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF065791),
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+                  SizedBox(height: isTablet ? 48 : 36),
+                  SizedBox(
+                    height: buttonHeight,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A4A8C),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              loginText,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: isTablet ? 20 : 17,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -192,6 +192,9 @@ class _ControlPanelState extends State<ControlPanel> {
     required double speed,
     required bool enabled,
     required bool isDark,
+    required double buttonWidth,
+    required double buttonHeight,
+    required double fontSize,
   }) {
     final isSelected = isOn && fanSpeed.round() == speed.round();
     final baseBackground = isDark
@@ -207,8 +210,8 @@ class _ControlPanelState extends State<ControlPanel> {
 
     return Center(
       child: SizedBox(
-        width: 300,
-        height: 74,
+        width: buttonWidth,
+        height: buttonHeight,
         child: ElevatedButton(
           onPressed: enabled ? () => setFanPreset(speed) : null,
           style: ElevatedButton.styleFrom(
@@ -229,7 +232,7 @@ class _ControlPanelState extends State<ControlPanel> {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 40 / 2,
+              fontSize: fontSize,
               fontWeight: FontWeight.w600,
               color: textColor,
             ),
@@ -241,6 +244,31 @@ class _ControlPanelState extends State<ControlPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final uiScale = isTablet ? 1.35 : 1.0;
+
+    final contentMaxWidth = isTablet ? 620.0 : 380.0;
+    final contentHorizontalPadding = isTablet ? 32.0 : 22.0;
+    final speedButtonWidth = isTablet ? 420.0 : 300.0;
+    final speedButtonHeight = isTablet ? 90.0 : 74.0;
+    final speedButtonFontSize = (40 / 2) * uiScale;
+
+    final toggleWidth = isTablet ? 300.0 : 240.0;
+    final toggleHeight = isTablet ? 82.0 : 64.0;
+    final toggleKnobWidth = isTablet ? 145.0 : 115.0;
+    final toggleKnobHeight = isTablet ? 76.0 : 59.0;
+    final toggleIconSize = isTablet ? 36.0 : 30.0;
+    final statusFontSize = (23 / 2) * uiScale;
+
+    final powerSize = isTablet ? 118.0 : 98.0;
+    final powerIconSize = isTablet ? 62.0 : 52.0;
+
+    final popupMaxWidth = isTablet ? 560.0 : 9999.0;
+    final menuLeft = isTablet
+        ? ((screenWidth - contentMaxWidth) / 2).clamp(0.0, 10000.0) + 16
+        : 22.0;
+
     final bleConnectedText = context.tr('ble_connected');
     final bleDisconnectedText = context.tr('ble_disconnected');
     final highText = context.tr('speed_high');
@@ -284,18 +312,18 @@ class _ControlPanelState extends State<ControlPanel> {
           SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 380),
+                constraints: BoxConstraints(maxWidth: contentMaxWidth),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: contentHorizontalPadding,
                     vertical: 18,
                   ),
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
                       Container(
-                        width: 240,
-                        height: 64,
+                        width: toggleWidth,
+                        height: toggleHeight,
                         decoration: BoxDecoration(
                           color: isDark
                               ? const Color(0xFFEBEDF0)
@@ -316,11 +344,13 @@ class _ControlPanelState extends State<ControlPanel> {
                               AnimatedPositioned(
                                 duration: const Duration(milliseconds: 220),
                                 curve: Curves.easeInOut,
-                                left: isDark ? 120.0 : 5.0,
+                                left: isDark
+                                    ? (toggleWidth - toggleKnobWidth - 5.0)
+                                    : 5.0,
                                 top: 2.5,
                                 child: Container(
-                                  width: 115,
-                                  height: 59,
+                                  width: toggleKnobWidth,
+                                  height: toggleKnobHeight,
                                   decoration: BoxDecoration(
                                     color: isDark
                                         ? const Color(0xFF1F2126)
@@ -341,7 +371,7 @@ class _ControlPanelState extends State<ControlPanel> {
                                           color: isDark
                                               ? const Color(0xFF1B1F24)
                                               : const Color(0xFF1F6CC0),
-                                          size: 30,
+                                          size: toggleIconSize,
                                         ),
                                       ),
                                     ),
@@ -356,7 +386,7 @@ class _ControlPanelState extends State<ControlPanel> {
                                           color: isDark
                                               ? const Color(0xFFE4EEF9)
                                               : const Color(0xFFE8F1FB),
-                                          size: 30,
+                                          size: toggleIconSize,
                                         ),
                                       ),
                                     ),
@@ -372,7 +402,7 @@ class _ControlPanelState extends State<ControlPanel> {
                         fanStatusText,
                         style: TextStyle(
                           color: headingColor,
-                          fontSize: 23 / 2,
+                          fontSize: statusFontSize,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -382,6 +412,9 @@ class _ControlPanelState extends State<ControlPanel> {
                         speed: 30,
                         enabled: isConnected,
                         isDark: isDark,
+                        buttonWidth: speedButtonWidth,
+                        buttonHeight: speedButtonHeight,
+                        fontSize: speedButtonFontSize,
                       ),
                       const SizedBox(height: 16),
                       _buildSpeedButton(
@@ -389,6 +422,9 @@ class _ControlPanelState extends State<ControlPanel> {
                         speed: 60,
                         enabled: isConnected,
                         isDark: isDark,
+                        buttonWidth: speedButtonWidth,
+                        buttonHeight: speedButtonHeight,
+                        fontSize: speedButtonFontSize,
                       ),
                       const SizedBox(height: 16),
                       _buildSpeedButton(
@@ -396,11 +432,14 @@ class _ControlPanelState extends State<ControlPanel> {
                         speed: 100,
                         enabled: isConnected,
                         isDark: isDark,
+                        buttonWidth: speedButtonWidth,
+                        buttonHeight: speedButtonHeight,
+                        fontSize: speedButtonFontSize,
                       ),
                       const SizedBox(height: 26),
                       SizedBox(
-                        width: 98,
-                        height: 98,
+                        width: powerSize,
+                        height: powerSize,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -415,7 +454,7 @@ class _ControlPanelState extends State<ControlPanel> {
                           ),
                           child: IconButton(
                             onPressed: isConnected ? togglePower : null,
-                            iconSize: 52,
+                            iconSize: powerIconSize,
                             color: powerIcon,
                             disabledColor: powerIcon.withValues(alpha: 0.5),
                             icon: const Icon(Icons.power_settings_new),
@@ -463,8 +502,8 @@ class _ControlPanelState extends State<ControlPanel> {
             ),
           ),
           Positioned(
-            top: 51,
-            left: 38,
+            top: isTablet ? 56 : 51,
+            left: menuLeft,
             width: 38,
             height: 20,
             child: GestureDetector(
@@ -481,101 +520,104 @@ class _ControlPanelState extends State<ControlPanel> {
             ),
             Positioned.fill(
               child: Center(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEAF4FC),
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x22000000),
-                        blurRadius: 18,
-                        offset: Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.bluetooth,
-                        size: 78,
-                        color: Color(0xFF065791),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        popupMessageText,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          height: 1.25,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF0B2140),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: popupMaxWidth),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEAF4FC),
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x22000000),
+                          blurRadius: 18,
+                          offset: Offset(0, 8),
                         ),
-                      ),
-                      const SizedBox(height: 28),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 58,
-                        child: ElevatedButton(
-                          onPressed: isConnecting ? null : connectBle,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1A4A8C),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.bluetooth,
+                          size: 78,
+                          color: Color(0xFF065791),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          popupMessageText,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            height: 1.25,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0B2140),
                           ),
-                          child: isConnecting
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                        ),
+                        const SizedBox(height: 28),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 58,
+                          child: ElevatedButton(
+                            onPressed: isConnecting ? null : connectBle,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1A4A8C),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: isConnecting
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    popupConnectText,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                )
-                              : Text(
-                                  popupConnectText,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const DeleteAccountScreen(),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const DeleteAccountScreen(),
+                              ),
                             ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: const Color(0xFFB71C1C),
-                            side: const BorderSide(color: Color(0xFFB71C1C)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFB71C1C),
+                              side: const BorderSide(color: Color(0xFFB71C1C)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            popupDeleteAccountText,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                            child: Text(
+                              popupDeleteAccountText,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+                        const SizedBox(height: 12),
+                      ],
+                    ),
                   ),
                 ),
               ),

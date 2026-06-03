@@ -94,6 +94,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   }
 
   void _showTermsDialog() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -101,183 +104,186 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Terms and Agreements',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: isTablet ? 680 : 520),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Terms and Agreements',
+                            style: TextStyle(
+                              fontSize: isTablet ? 24 : 20,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.close, color: Colors.black),
-                          padding: EdgeInsets.zero,
-                          alignment: Alignment.center,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          '1. Acceptance of Terms',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: IconButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.close, color: Colors.black),
+                            padding: EdgeInsets.zero,
+                            alignment: Alignment.center,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'By creating an account and using The Visionaries app, you agree to these terms and conditions. If you do not agree, please do not use this application.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          '2. User Responsibilities',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us of any unauthorized use of your account.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          '3. User Conduct',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'You agree not to use the app for any unlawful purposes or in any way that violates applicable laws or regulations. Prohibited activities include harassment, defamation, and dissemination of malware.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          '4. Intellectual Property Rights',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'All content, features, and functionality of The Visionaries app are owned by The Visionaries, its licensors, or other providers of such material and are protected by international copyright and other intellectual property laws.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          '5. Limitation of Liability',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'The Visionaries app is provided "as is" without warranties of any kind. We shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the app.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          '6. Changes to Terms',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'We reserve the right to modify these terms at any time. Your continued use of the app following any changes constitutes your acceptance of the new terms.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF6E6E6E),
-                          ),
-                        ),
-                        SizedBox(height: 24),
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _agreedToTerms = true);
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF24579D),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            '1. Acceptance of Terms',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'By creating an account and using The Visionaries app, you agree to these terms and conditions. If you do not agree, please do not use this application.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '2. User Responsibilities',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us of any unauthorized use of your account.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '3. User Conduct',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'You agree not to use the app for any unlawful purposes or in any way that violates applicable laws or regulations. Prohibited activities include harassment, defamation, and dissemination of malware.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '4. Intellectual Property Rights',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'All content, features, and functionality of The Visionaries app are owned by The Visionaries, its licensors, or other providers of such material and are protected by international copyright and other intellectual property laws.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '5. Limitation of Liability',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'The Visionaries app is provided "as is" without warranties of any kind. We shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the app.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            '6. Changes to Terms',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'We reserve the right to modify these terms at any time. Your continued use of the app following any changes constitutes your acceptance of the new terms.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF6E6E6E),
+                            ),
+                          ),
+                          SizedBox(height: 24),
+                        ],
                       ),
-                      child: const Text(
-                        'I Agree',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() => _agreedToTerms = true);
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF24579D),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'I Agree',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -361,6 +367,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 700;
+    final formMaxWidth = isTablet ? 760.0 : 380.0;
+    final fieldWidth = isTablet ? 620.0 : 341.0;
+    final fieldHeight = isTablet ? 62.0 : 56.0;
+
     final createTitle = context.tr('create_title');
     final fullNameText = context.tr('create_full_name');
     final userIdText = context.tr('create_user_id');
@@ -371,181 +383,192 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              IconButton(
-                onPressed: () => Navigator.of(context).maybePop(),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 34,
-                ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: formMaxWidth),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                isTablet ? 32 : 24,
+                18,
+                isTablet ? 32 : 24,
+                24,
               ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  createTitle,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: SizedBox(
-                  width: 341,
-                  height: 56,
-                  child: TextField(
-                    controller: _fullNameController,
-                    decoration: _fieldDecoration(fullNameText),
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: SizedBox(
-                  width: 341,
-                  height: 56,
-                  child: TextField(
-                    controller: _userController,
-                    decoration: _fieldDecoration(userIdText),
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: SizedBox(
-                  width: 341,
-                  height: 56,
-                  child: TextField(
-                    controller: _passwordController,
-                    decoration: _fieldDecoration(passwordText),
-                    obscureText: true,
-                    textInputAction: TextInputAction.next,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Center(
-                child: SizedBox(
-                  width: 341,
-                  height: 56,
-                  child: TextField(
-                    controller: _confirmPasswordController,
-                    decoration: _fieldDecoration(confirmPasswordText),
-                    obscureText: true,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _languageOption(AppLanguage.english),
-              _languageOption(AppLanguage.spanish),
-              _languageOption(AppLanguage.german),
-              _languageOption(AppLanguage.guarani),
-              const SizedBox(height: 80),
-              Row(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: Checkbox(
-                      value: _agreedToTerms,
-                      onChanged: (value) {
-                        setState(() => _agreedToTerms = value ?? false);
-                      },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      side: const BorderSide(
-                        color: Color(0xFF1C1C1C),
-                        width: 1,
-                      ),
-                      activeColor: Colors.white,
-                      checkColor: Colors.black,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  IconButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: isTablet ? 38 : 34,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _showTermsDialog,
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'I agree to the ',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black,
-                              ),
-                            ),
-                            TextSpan(
-                              text: 'Terms and Agreements',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF0E6CC4),
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      createTitle,
+                      style: TextStyle(
+                        fontSize: isTablet ? 38 : 30,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: isTablet ? 16 : 12),
+                  Center(
+                    child: SizedBox(
+                      width: fieldWidth,
+                      height: fieldHeight,
+                      child: TextField(
+                        controller: _fullNameController,
+                        decoration: _fieldDecoration(fullNameText),
+                        textInputAction: TextInputAction.next,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: SizedBox(
+                      width: fieldWidth,
+                      height: fieldHeight,
+                      child: TextField(
+                        controller: _userController,
+                        decoration: _fieldDecoration(userIdText),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: SizedBox(
+                      width: fieldWidth,
+                      height: fieldHeight,
+                      child: TextField(
+                        controller: _passwordController,
+                        decoration: _fieldDecoration(passwordText),
+                        obscureText: true,
+                        textInputAction: TextInputAction.next,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: SizedBox(
+                      width: fieldWidth,
+                      height: fieldHeight,
+                      child: TextField(
+                        controller: _confirmPasswordController,
+                        decoration: _fieldDecoration(confirmPasswordText),
+                        obscureText: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _languageOption(AppLanguage.english),
+                  _languageOption(AppLanguage.spanish),
+                  _languageOption(AppLanguage.german),
+                  _languageOption(AppLanguage.guarani),
+                  SizedBox(height: isTablet ? 10 : 42),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: Checkbox(
+                          value: _agreedToTerms,
+                          onChanged: (value) {
+                            setState(() => _agreedToTerms = value ?? false);
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          side: const BorderSide(
+                            color: Color(0xFF1C1C1C),
+                            width: 1,
+                          ),
+                          activeColor: Colors.white,
+                          checkColor: Colors.black,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: SizedBox(
-                  width: 341,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _createAccount,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF24579D),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            createButtonText,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _showTermsDialog,
+                          child: RichText(
+                            text: TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'I agree to the ',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Terms and Agreements',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF0E6CC4),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: SizedBox(
+                      width: fieldWidth,
+                      height: fieldHeight,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _createAccount,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF24579D),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                createButtonText,
+                                style: TextStyle(
+                                  fontSize: isTablet ? 20 : 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: isTablet ? 4 : 20),
+                ],
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),
